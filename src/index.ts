@@ -1,5 +1,6 @@
-import mcpServer from "./server.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+
+import mcpServer from "./server.js";
 
 // 这个文件现在只需要导入 server.ts
 // 所有的服务器逻辑都已经移到了 server.ts 中

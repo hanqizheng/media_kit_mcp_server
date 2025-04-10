@@ -1,6 +1,6 @@
 {
   "name": "media_kit_mcp",
-  "version": "1.0.0",
+  "version": "1.2.0",
   "description": "Media Kit MCP Server",
   "type": "module",
   "main": "index.js",
