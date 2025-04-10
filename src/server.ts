@@ -1,4 +1,7 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import { deepseekClient } from "./helper/deepseek.js";
+import { Markdownify } from "./helper/markdownify.js";
 import { z } from "zod";
 
 // 定义参数类型
@@ -11,43 +14,74 @@ interface MarkdownParams {
 }
 
 // 创建 MCP 服务器实例
-const mcpServer = new McpServer({
+const server = new McpServer({
   name: "media_kit_mcp",
-  version: "1.0.0",
-  capabilities: {
-    tools: {
-      "parse-pdf-to-markdown": {
-        description: "Parse PDF to markdown",
-        parameters: {
-          pdfUrl: {
-            type: "string",
-            description: "URL of the PDF to parse",
-          },
-        },
-      },
-    },
-  },
+  version: "1.1.0",
 });
 
-mcpServer.tool(
+// 添加工具
+server.tool(
   "parse-pdf-to-markdown",
   {
-    pdfUrl: z.string().describe("URL of the PDF to parse"),
+    pdfUrl: z.string().describe("Local PDF file URL (file:// protocol)"),
   },
-  async (params) => {
-    console.error(`Parsing PDF from URL: ${params.pdfUrl}`);
-    // 这里应该是实际的 PDF 解析逻辑
-    // 目前返回模拟数据
-    return {
-      content: [
-        {
-          type: "text",
-          text: "This is a mock markdown representation of the PDF at ${params.pdfUrl}.\n\n## Company Overview\n\nLorem ipsum dolor sit amet, consectetur adipiscing elit.\n\n## Products\n\n- Product 1\n- Product 2\n- Product 3\n\n## Contact Information\n\nEmail: contact@example.com\nPhone: (123) 456-7890",
-        },
-      ],
-    };
+  async (params: PDFParams) => {
+    try {
+      console.error(`Processing PDF from path: ${params.pdfUrl}`);
+
+      // 直接使用 Markdownify 处理本地 PDF 文件
+      const markdownResult = await Markdownify.toMarkdown(params.pdfUrl);
+      console.error(`PDF converted to markdown: ${markdownResult.path}`);
+
+      return {
+        content: [
+          {
+            type: "text",
+            text: markdownResult.text,
+          },
+        ],
+      };
+    } catch (error) {
+      console.error("Error parsing PDF:", error);
+      return {
+        content: [
+          {
+            type: "text",
+            text: `Error parsing PDF: ${
+              error instanceof Error ? error.message : String(error)
+            }`,
+          },
+        ],
+      };
+    }
   }
 );
 
-// 导出服务器实例
-export default mcpServer;
+server.tool(
+  "abstract-media-kit-main-content",
+  {
+    markdown: z.string().describe("Markdown content to summarize"),
+  },
+  async (params: MarkdownParams) => {
+    try {
+      console.error("Abstracting media kit content");
+
+      // 使用 DeepSeek 生成摘要
+      const summary = await deepseekClient.summarizeContent(params.markdown);
+
+      return {
+        content: [
+          {
+            type: "text",
+            text: summary,
+          },
+        ],
+      };
+    } catch (error) {
+      console.error("Error abstracting content:", error);
+      throw error;
+    }
+  }
+);
+
+export default server;
