@@ -1,6 +1,4 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import { deepseekClient } from "./helper/deepseek.js";
 import { Markdownify } from "./helper/markdownify.js";
 import { z } from "zod";
 
@@ -17,6 +15,17 @@ interface MarkdownParams {
 const server = new McpServer({
   name: "media_kit_mcp",
   version: "1.1.0",
+  capabilities: {
+    "parse-pdf-to-markdown": {
+      description: "Parse a local PDF file to markdown",
+      parameters: {
+        pdfUrl: {
+          type: "string",
+          description: "Local PDF file URL (file:// protocol)",
+        },
+      },
+    },
+  },
 });
 
 // 添加工具
@@ -53,33 +62,6 @@ server.tool(
           },
         ],
       };
-    }
-  }
-);
-
-server.tool(
-  "abstract-media-kit-main-content",
-  {
-    markdown: z.string().describe("Markdown content to summarize"),
-  },
-  async (params: MarkdownParams) => {
-    try {
-      console.error("Abstracting media kit content");
-
-      // 使用 DeepSeek 生成摘要
-      const summary = await deepseekClient.summarizeContent(params.markdown);
-
-      return {
-        content: [
-          {
-            type: "text",
-            text: summary,
-          },
-        ],
-      };
-    } catch (error) {
-      console.error("Error abstracting content:", error);
-      throw error;
     }
   }
 );
