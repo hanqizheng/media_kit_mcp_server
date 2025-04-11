@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Media Kit 解析</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+      .container {
+        background-color: #f5f5f5;
+        padding: 20px;
+        border-radius: 8px;
+      }
+      form {
+        margin: 20px 0;
+      }
+      input[type="text"] {
+        width: 100%;
+        padding: 8px;
+        margin: 8px 0;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+      }
+      button {
+        background-color: #4caf50;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+      button:hover {
+        background-color: #45a049;
+      }
+      #result {
+        margin-top: 20px;
+        white-space: pre-wrap;
+        background-color: white;
+        padding: 15px;
+        border-radius: 4px;
+        border: 1px solid #ddd;
+      }
+      .loading {
+        display: none;
+        margin: 20px 0;
+      }
+      .error {
+        color: red;
+        margin: 10px 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Media Kit 解析</h1>
+      <p>请输入本地 PDF 文件的 URL (e.g., file:///xxxxx/xxxx.pdf)</p>
+
+      <form id="analyzeForm">
+        <label for="pdfUrl">PDF 文件 URL:</label><br />
+        <input
+          type="text"
+          id="pdfUrl"
+          name="pdfUrl"
+          placeholder="file:///path/to/your/file.pdf"
+        /><br />
+        <button type="submit">解析 Media Kit</button>
+      </form>
+
+      <div id="loading" class="loading">
+        解析中，请稍后...
+      </div>
+      <div id="error" class="error"></div>
+      <div id="result"></div>
+    </div>
+
+    <script>
+      // 配置后端 API URL
+      const API_URL = "http://localhost:3000";
+
+      document
+        .getElementById("analyzeForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+
+          const pdfUrl = document.getElementById("pdfUrl").value;
+          const loading = document.getElementById("loading");
+          const error = document.getElementById("error");
+          const result = document.getElementById("result");
+
+          // Reset previous state
+          error.textContent = "";
+          result.textContent = "";
+          loading.style.display = "block";
+
+          try {
+            const response = await fetch(`${API_URL}/analyze`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ pdfUrl }),
+            });
+
+            if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            result.innerHTML = `<h3>Analysis Results:</h3><pre>${JSON.stringify(
+              data,
+              null,
+              2
+            )}</pre>`;
+          } catch (err) {
+            error.textContent = `Error: ${err.message}`;
+          } finally {
+            loading.style.display = "none";
+          }
+        });
+    </script>
+  </body>
+</html>

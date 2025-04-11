@@ -1,6 +1,6 @@
 {
   "name": "media_kit_mcp",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "Media Kit MCP Server",
   "type": "module",
   "main": "index.js",
@@ -8,7 +8,8 @@
     "media-kit-mcp": "./dist/index.js"
   },
   "scripts": {
-    "build": "tsc && chmod 755 dist/index.js"
+    "build": "tsc && chmod 755 dist/index.js",
+    "node-server": "tsc && node dist/nodeServer.js"
   },
   "keywords": [],
   "author": "",
