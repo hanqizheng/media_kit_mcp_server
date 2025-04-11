@@ -39,11 +39,21 @@ app.post("/analyze", async (req, res) => {
       },
     });
 
-    const markdown = pdfResponse.content;
-    console.log("PDF successfully converted to markdown");
+    const markdown = (pdfResponse.content as { text: string }[])?.[0]?.text;
+    console.log("PDF successfully converted to markdown", markdown);
 
+    // 第二步：调用 analyze-media-kit
+    const analysisResponse = await mcpClient.callTool({
+      name: "analyze-media-kit",
+      arguments: {
+        markdown,
+      },
+    });
+
+    const analysisResult = (analysisResponse.content as { text: string }[])?.[0]
+      ?.text;
     // 将分析结果返回给客户端
-    res.json(markdown);
+    res.json(analysisResult);
   } catch (error) {
     console.error("Error processing request:", error);
     res.status(500).json({

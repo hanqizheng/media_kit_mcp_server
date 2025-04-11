@@ -10,11 +10,13 @@ async function createClient() {
   if (!client || !transport) {
     const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-    console.log("__dirname", path.join(__dirname, "server.js"));
-
     transport = new StdioClientTransport({
       command: "node",
       args: [path.join(__dirname, "index.js")],
+      env: {
+        ...process.env,
+        DEEP_SEEK_API_KEY: "sk-8c7bc5d9a36947ae87e0b889c6d5f7cc",
+      },
     });
 
     client = new Client({
