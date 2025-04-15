@@ -82,14 +82,9 @@ export class DeepSeekClient {
       {
         "name": "套餐名称",
         "price": "价格",
-        "features": ["功能1", "功能2"]
+        "position": "投放位置"
       }
     ]
-  },
-  "analysis": {
-    "advantages": ["优势1", "优势2", "优势3"],
-    "risks": ["风险1", "风险2"],
-    "suggestions": ["建议1", "建议2"]
   }
 }
 
@@ -97,8 +92,9 @@ export class DeepSeekClient {
 1. 保持原始数字单位（K、M等）
 2. 所有文本必须用中文输出
 3. 如信息缺失则返回null
-4. 优势、风险、建议各控制在3点以内
-5. 确保输出为有效的JSON格式`;
+4. 输出结果中不要包含任何解释性文字
+5. 确保输出为有效的JSON格式
+`;
 
       const response = await this.client.chat.completions.create({
         model: "deepseek-chat",
@@ -113,7 +109,7 @@ export class DeepSeekClient {
           },
         ],
         temperature: 0.3,
-        max_tokens: 2000,
+        max_tokens: 8000,
         response_format: { type: "json_object" },
       });
 
