@@ -195,7 +195,7 @@ ts-node src/test/deepseek.test.ts
 
 ## License
 
-This project is licensed under the ISC License. See the [LICENSE](https://opensource.org/licenses/ISC) file for details.
+This project is licensed under the **ISC** License.
 
 ---
 
