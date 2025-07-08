@@ -11,21 +11,64 @@ const server = new McpServer({
   version: "1.3.0",
   capabilities: {
     "parse-pdf-to-markdown": {
-      description: "Parse a local PDF file to markdown",
+      description: "Convert a local PDF file (file://) to Markdown text.",
       parameters: {
         pdfUrl: {
           type: "string",
           description: "Local PDF file URL (file:// protocol)",
         },
       },
+      returns: {
+        type: "object",
+        description: "Markdown content extracted from the PDF.",
+        properties: {
+          content: {
+            type: "array",
+            items: {
+              type: "object",
+              properties: {
+                type: { type: "string", enum: ["text"] },
+                text: { type: "string" },
+              },
+            },
+          },
+          error: {
+            type: "string",
+            description: "Error message if any error occurred.",
+          },
+        },
+      },
     },
     "analyze-media-kit": {
       description:
-        "Comprehensive analysis of media kit content including target audience, pricing structure, and marketing insights",
+        "Analyze media kit Markdown content and return structured insights (audience, pricing, etc.)",
       parameters: {
         markdown: {
           type: "string",
           description: "Markdown content to analyze",
+        },
+      },
+      returns: {
+        type: "object",
+        description: "Structured analysis result in JSON format.",
+        properties: {
+          content: {
+            type: "array",
+            items: {
+              type: "object",
+              properties: {
+                type: { type: "string", enum: ["text"] },
+                text: {
+                  type: "string",
+                  description: "JSON string of analysis result",
+                },
+              },
+            },
+          },
+          error: {
+            type: "string",
+            description: "Error message if any error occurred.",
+          },
         },
       },
     },
